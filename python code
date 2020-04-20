@@ -1,0 +1,40 @@
+#import necessary modules into python
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+import numpy as np
+
+#import the raw data file
+file = "WDIW Dataset.xlsx"
+raw = pd.read_excel(file)
+
+# changing long unnecessary column names
+new_columns = ['Country Code', 'Country Name', 'Hult Region', 'Cool Name',
+       'electricity total', 'electricity rural', 'electricity urban',
+       'fertility 15-19', 'age dependency total', 'age dependency old',
+       'age dependency young', 'agriculture %GDP', 'military % of work pop',
+       'birth rate', 'birth skilled', 'death rate', 'PhD', 'bachelor',
+       'master', 'lower secondary', 'post secondary', 'primary',
+       'short-cycle tertiary', 'upper secondary', 'employment agriculture',
+       'employment industry', 'employment service', 'fertility rate', 'GDP',
+       'GDP growth', 'GINI index', 'education expenditure %',
+       'income share fourth quantile', 'income share first quantile',
+       'income share fifth quantile', 'income share second quantile',
+       'income share third quantile', 'industry % GDP', 'life expectancy',
+       'literacy adult', 'literacy young', 'trade % GDP', 'military % GDP',
+       'mobile per 100', 'health poverty below $3.10', 'population 0-14',
+       'population 15-64', 'population 65 above', 'population density',
+       'population growth', 'pop largest city (% of urban pop)',
+       'pop slums (% of urban pop)', 'pop female', 'pop male', 'pop total',
+       'poverty $1.90 a day', 'poverty $3.20 a day', 'poverty ratio',
+       'HIV rate', 'undernourishment %', 'underweight children under 5',
+       'rural pop', 'service % GDP', 'surface area', 'tax revenue % GDP',
+       'urban pop', 'urban pop growth']
+
+# changed the name of the columns into shorter form
+raw.columns = new_columns
+
+# adding additional columns into the data: GDP per capita
+raw['GDP per capita'] = raw['GDP'] / raw['pop total']
+# added social progress index
+spi = pd.read_excel(file2)
