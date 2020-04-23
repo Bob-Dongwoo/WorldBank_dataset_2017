@@ -36,5 +36,32 @@ raw.columns = new_columns
 
 # adding additional columns into the data: GDP per capita
 raw['GDP per capita'] = raw['GDP'] / raw['pop total']
+
 # added social progress index
+file2 = 'SPI.xlsx'
 spi = pd.read_excel(file2)
+
+# in the SPI dataset the country name contains unnecessary spaces 
+country_name = []
+for country in spi['Country Name'].values:
+    country_name.append(country.rstrip()) # getting rid of unnecessary spaces
+
+# replacing the values with the cleaned country name
+spi['Country Name'] = country_name
+
+# Merging the SPI data to the raw data on the country name column
+merge = pd.merge(raw, spi, how = 'left', on = 'Country Name')
+
+#import the metadata file
+file3 = 'WDI_Metadata.xlsx'
+metadata = pd.ExcelFile(file3)
+
+# metadata file contains multiple excel sheet
+country_data = metadata.parse('Country - Metadata') #parsing the necessary sheet
+
+# selecting the necessary columns the region and income group of countries
+country_income_region = country_data[['Country Code', 'Income Group', 'Region']]
+
+# merging the two dataframes on the country code since merge(raw) is the main left join is used
+merge2 = pd.merge(merge, country_income_region, on = 'Country Code', how = 'left')
+
