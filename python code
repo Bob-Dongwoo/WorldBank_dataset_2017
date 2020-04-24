@@ -65,3 +65,212 @@ country_income_region = country_data[['Country Code', 'Income Group', 'Region']]
 # merging the two dataframes on the country code since merge(raw) is the main left join is used
 merge2 = pd.merge(merge, country_income_region, on = 'Country Code', how = 'left')
 
+########################################## filling in the missing values
+# loading the excel file with multiple sheets containing research data
+file4 = 'missing.xlsx'
+missing = pd.ExcelFile(file4)
+print(missing.sheet_names)
+
+# parsing births attended by skilled labor sheet and cleaning
+births = missing.parse('births (skill labor)')
+births.index = births['Unnamed: 0']
+birth_2017 = dict(births[2017])
+
+# parsing tax revenue by countries and cleaning
+tax_revenue = missing.parse('tax revenue')
+tax_revenue.index = tax_revenue['Unnamed: 0']
+tax_revenue_2017 = dict(tax_revenue[2017])
+
+# parsing adult literacy rate by countries and cleaning
+literacy_rate = missing.parse('literacy rate (old)')
+literacy_rate.index = literacy_rate['Unnamed: 0']
+literacy_rate_2017 = dict(literacy_rate[2017])
+
+# parsing poverty line $1.9 by countries and cleaning
+poverty_19 = missing.parse('poverty line 1.9')
+poverty_19.index = poverty_19['Unnamed: 0']
+poverty_19_2017 = dict(poverty_19[2017])
+
+# parsing Gini index by countries and cleaning
+gini = missing.parse('gini index')
+gini.index = gini['Unnamed: 0']
+gini_2017 = dict(gini[2017])
+
+# parsing military expenditure by countries and cleaning
+military = missing.parse('military expenditure')
+military.index = military['Unnamed: 0']
+military_2017 = dict(military[2017])
+
+# parsing poverty line $3.2 by countries and cleaning
+poverty_32 = missing.parse('poverty 3.2')
+poverty_32.index = poverty_32['Unnamed: 0']
+poverty_32_2017 = dict(poverty_32[2017])
+
+# parsing education phd by countries and cleaning
+education_phd = missing.parse('education doctor')
+education_phd.index = education_phd['Unnamed: 0']
+education_phd_2017 = dict(education_phd[2017])
+
+# parsing education bachelor by countries and cleaning
+education_bac = missing.parse('education bachelor')
+education_bac.index = education_bac['Unnamed: 0']
+education_bac_2017 = dict(education_bac[2017])
+
+# parsing education masters by countries and cleaning
+education_mas = missing.parse('education master')
+education_mas.index = education_mas['Unnamed: 0']
+education_mas_2017 = dict(education_mas[2017])
+
+# parsing education lower secondary by countries and cleaning
+education_ls = missing.parse('education lower secondary')
+education_ls.index = education_ls['Unnamed: 0']
+education_ls_2017 = dict(education_ls[2017])
+
+# parsing education post secondary by countries and cleaning
+education_ps = missing.parse('education post secondary')
+education_ps.index = education_ps['Unnamed: 0']
+education_ps_2017 = dict(education_ps[2017])
+
+# parsing education primary by countries and cleaning
+education_pri = missing.parse('education primary')
+education_pri.index = education_pri['Unnamed: 0']
+education_pri_2017 = dict(education_pri[2017])
+
+# parsing education short tertiary by countries and cleaning
+education_st = missing.parse('education short tertiary')
+education_st.index = education_st['Unnamed: 0']
+education_st_2017 = dict(education_st[2017])
+
+# parsing education upper secondary by countries and cleaning
+education_us = missing.parse('education upper secondary')
+education_us.index = education_us['Unnamed: 0']
+education_us_2017 = dict(education_us[2017])
+
+# population of largest city
+big_city = missing.parse('biggest city')
+big_city.index = big_city['Unnamed: 0']
+big_city_2017 = dict(big_city[2017])
+
+#income share per quantile
+#parsing first quantile and extract values
+first_quant = missing.parse('first share ')
+first_quant.index = first_quant['Unnamed: 0']
+first_quant_2017 = dict(first_quant[2017])
+
+#parsing second quantile and extract values
+second_quant = missing.parse('second share')
+second_quant.index = second_quant['Unnamed: 0']
+second_quant_2017 = dict(second_quant[2017])
+
+#parsing third quantile and extract values
+third_quant = missing.parse('third share')
+third_quant.index = third_quant['Unnamed: 0']
+third_quant_2017 = dict(third_quant[2017])
+
+#parsing fourth quantile and extract values
+fourth_quant = missing.parse('fourth share')
+fourth_quant.index = fourth_quant['Unnamed: 0']
+fourth_quant_2017 = dict(fourth_quant[2017])
+
+#parsing fifth quantile and extract values
+fifth_quant = missing.parse('fifth share')
+fifth_quant.index = fifth_quant['Unnamed: 0']
+fifth_quant_2017 = dict(fifth_quant[2017])
+
+#educational expenditure spent by government expenss and extract values
+educational_expenditure = missing.parse('education expenditure')
+educational_expenditure.index = educational_expenditure['Unnamed: 0']
+educational_expenditure_2017 = dict(educational_expenditure[2017])
+
+###################################################################################
+# Imputing the dictionary into the original data set using the key value pairs
+for country in birth_2017.keys():
+    merge2.loc[:, 'birth skilled'][merge2['Country Name'] == country] = birth_2017[country]
+    
+for country in tax_revenue_2017.keys():
+    merge2.loc[:, 'tax revenue % GDP'][merge2['Country Name'] == country] = tax_revenue_2017[country]
+    
+for country in literacy_rate_2017.keys():
+    merge2.loc[:, 'literacy adult'][merge2['Country Name'] == country] = literacy_rate_2017[country]
+    
+for country in poverty_19_2017.keys():
+    merge2.loc[:, 'poverty $1.90 a day'][merge2['Country Name'] == country] = poverty_19_2017[country]
+    
+for country in gini_2017.keys():
+    merge2.loc[:, 'GINI index'][merge2['Country Name'] == country] = gini_2017[country]
+    
+for country in military_2017.keys():
+    merge2.loc[:, 'military % GDP'][merge2['Country Name'] == country] = military_2017[country]
+    
+for country in poverty_32_2017.keys():
+    merge2.loc[:, 'poverty $3.20 a day'][merge2['Country Name'] == country] = poverty_32_2017[country]
+    
+for country in education_phd_2017.keys():
+    merge2.loc[:, 'PhD'][merge2['Country Name'] == country] = education_phd_2017[country]
+    
+for country in education_bac_2017.keys():
+    merge2.loc[:, 'bachelor'][merge2['Country Name'] == country] = education_bac_2017[country]
+    
+for country in education_mas_2017.keys():
+    merge2.loc[:, 'master'][merge2['Country Name'] == country] = education_mas_2017[country]
+    
+for country in education_ls_2017.keys():
+    merge2.loc[:, 'lower secondary'][merge2['Country Name'] == country] = education_ls_2017[country]
+    
+for country in education_ps_2017.keys():
+    merge2.loc[:, 'post secondary'][merge2['Country Name'] == country] = education_ps_2017[country]
+    
+for country in education_pri_2017.keys():
+    merge2.loc[:, 'primary'][merge2['Country Name'] == country] = education_pri_2017[country]
+    
+for country in education_st_2017.keys():
+    merge2.loc[:, 'short-cycle tertiary'][merge2['Country Name'] == country] = education_st_2017[country]
+    
+for country in education_us_2017.keys():
+    merge2.loc[:, 'upper secondary'][merge2['Country Name'] == country] = education_us_2017[country]
+    
+for country in big_city_2017.keys():
+    merge2.loc[:, 'pop largest city (% of urban pop)'][merge2['Country Name'] == country] = big_city_2017[country]
+    
+for country in first_quant_2017.keys():
+    merge2.loc[:, 'income share first quantile'][merge2['Country Code'] == country] = first_quant_2017[country]
+    
+for country in second_quant_2017.keys():
+    merge2.loc[:, 'income share second quantile'][merge2['Country Code'] == country] = second_quant_2017[country]
+    
+for country in third_quant_2017.keys():
+    merge2.loc[:, 'income share third quantile'][merge2['Country Code'] == country] = third_quant_2017[country]
+    
+for country in fifth_quant_2017.keys():
+    merge2.loc[:, 'income share fifth quantile'][merge2['Country Code'] == country] = fifth_quant_2017[country]
+    
+for country in educational_expenditure_2017.keys():
+    merge2.loc[:, 'education expenditure %'][merge2['Country Code'] == country] = educational_expenditure_2017[country]
+
+#######################################################################################
+#Single valueimputation
+
+# changing index as country name
+merge2.index = merge2['Country Name']
+
+#filtering by income group and region
+#Bhuthan group : lower middle income group in South Asia
+lower_middle = merge2.loc[merge2['Income Group'] == 'Lower middle income']
+south_asia_lower_middle = lower_middle.loc[lower_middle['Region'] == 'South Asia']
+
+#Bhuthan group : lower middle income group in South Asia
+#Bhuthan's military expenditure % of GDP imputation using the group's median value
+bhutan_military = south_asia_lower_middle['military % GDP'].median()
+merge2['military % GDP']['Bhutan'] = bhutan_military
+
+#Bhuthan's military % of working population imputation using the group's median value
+bhutan_military_personnel = south_asia_lower_middle['military % of work pop'].median()
+merge2['military % of work pop']['Bhutan'] = bhutan_military_personnel
+
+#Single value imputation using the values found on internet
+merge2['HIV rate']['India'] = 0.2
+merge2['GINI index']['India'] = 47.9
+merge2['GINI index']['Nepal'] = 38.9
+
+# Saving the cleaned data to an excel file
+merge2.to_excel('WDIW Dataset_v8.xlsx')
