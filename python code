@@ -274,3 +274,138 @@ merge2['GINI index']['Nepal'] = 38.9
 
 # Saving the cleaned data to an excel file
 merge2.to_excel('WDIW Dataset_v8.xlsx')
+
+#team country sliced
+dinobots = merge2.loc[merge2['Cool Name'] == 'Dinobots']
+
+# Comparing agriculture and service and its contribution to the GDP on the same graph
+service = dinobots[['employment service', 'service % GDP']].reset_index()
+agriculture = dinobots[['employment agriculture', 'agriculture %GDP']].reset_index()
+
+# Combining two dataframes service and agriculture as a single dataframes
+# The column names were changed (employment service and employment agriculture) -> % of employment
+# The column names were changed (service % GDP and agriculture % GDP) -> % of GDP
+# Create new column industry to label rows as either service or agriculture depending on which dataframe it comes from
+df = pd.concat([service.rename(columns ={'employment service':'% of employment', 'service % GDP':'% of GDP'})
+                .join(pd.Series(['service']*len(service), name='industry')),
+                agriculture.rename(columns={'employment agriculture':'% of employment','agriculture %GDP':'% of GDP'})          
+                .join(pd.Series(['agriculture']*len(agriculture), name='industry'))],
+               ignore_index = True)
+
+# Creating a scatterplot using FacetGrid and passing industry column as hue to show both agriculture and service industries
+g = sns.FacetGrid(df, hue = 'industry', height=5)
+g.map(sns.regplot, "% of employment", "% of GDP")
+g.map(sns.regplot, "% of employment", "% of GDP")
+g.add_legend()
+plt.savefig('employment type.png')
+plt.show()
+
+# urban population and the employment in service have positive correlation
+urban_service = sns.regplot(x = 'employment service', y = 'urban pop', data = dinobots, fit_reg = True)
+
+# adding country name as text
+for line in range(0,dinobots.shape[0]):
+     urban_service.text(dinobots['employment service'][line],
+                        dinobots['urban pop'][line]+0.5,
+                        dinobots['Country Name'][line], 
+                        horizontalalignment='left', 
+                        size= 10, 
+                        color='black')
+plt.show()
+
+# Fiding outliers in population density 
+plt.boxplot(x            = 'population density',
+            data         = dinobots,
+            vert         = False,
+            patch_artist = True,
+            meanline     = True,
+            showmeans    = True)
+plt.title('population density')
+# show your plot
+plt.savefig('outlierbox.png')
+plt.show()
+
+sns.distplot(dinobots['population density'],
+            bins= 35,
+            color='gold')
+# Threshhold of outlier as 750
+pop_hi_dens=750
+plt.axvline(pop_hi_dens, color= 'r')
+plt.savefig('outlier.png')
+plt.show()
+
+# Box plot on urban population growth
+plt.figure(figsize = (10,10))
+plt.subplot(2,2,1)
+plt.boxplot(x            = 'urban pop growth',
+            data         = dinobots,           
+            vert         = False,
+            patch_artist = True,
+            meanline     = True,
+            showmeans    = True)
+# Regression plot on urban population growth against population growth
+plt.subplot(2,2,2)
+dinobots_lifeexp= sns.regplot(x = 'urban pop growth', y = 'population growth', data = dinobots, fit_reg = True)
+for line in range(0,dinobots.shape[0]):
+     dinobots_lifeexp.text(dinobots['urban pop growth'][line],
+                               dinobots['population growth'][line],
+                               dinobots['Country Name'][line], 
+                               horizontalalignment='left', 
+                               size='small',
+                               alpha= 0.4,
+                               color='black')
+
+# Regression plot on population growth and age dependency rate
+plt.subplot(2,2,3)
+dino_myanmar=sns.regplot(x = 'population growth', y = 'age dependency total', data = dinobots, fit_reg = True)
+for line in range(0,dinobots.shape[0]):
+     dino_myanmar.text(dinobots['population growth'][line],
+                               dinobots['age dependency total'][line],
+                               dinobots['Country Name'][line], 
+                               horizontalalignment='left', 
+                               size='small',
+                               alpha= 0.4,
+                               color='black')
+plt.show()
+# pairplot on education expenditure and military expenditure
+sns.pairplot(data = dinobots,
+             x_vars = ['education expenditure %', 'military % GDP'],
+             y_vars = ['Country Name'],
+             palette = 'plasma')
+# Make your plot tighter 
+plt.tight_layout()
+plt.savefig('Myanmar.png')
+plt.show()
+
+# Countries of interest access to electricity and GDP per capita to see positive correlation
+# Not in a linear manner but in a logarithmic manner
+dinobots_electricity = sns.regplot(x = 'GDP per capita', y = 'electricity total', data = dinobots, logx = True)
+for line in range(0,dinobots.shape[0]):
+     dinobots_electricity.text(dinobots['GDP per capita'][line],
+                               dinobots['electricity total'][line]+0.5,
+                               dinobots['Country Name'][line], 
+                               horizontalalignment='left', 
+                               size= 15, 
+                               color='black')
+plt.ylabel('access to electricity',size = 15)
+plt.xlabel('GDP per capita', size = 15)
+plt.savefig('labeling countries.png')
+plt.show()
+
+# Using social progress index score and comparing to GDP per capita
+# It is highly correlated but may not always mean that high GDP per lead high social progress index
+# It can also be affected by politics and infrastructure and other factors affecting
+dinobots_score = sns.regplot(x = 'Score', y = 'GDP per capita', data = dinobots)
+for line in range(0,dinobots.shape[0]):
+     dinobots_score.text(dinobots['Score'][line],
+                         dinobots['GDP per capita'][line],
+                         dinobots['Country Name'][line], 
+                         horizontalalignment='left', 
+                         size='small', 
+                         color='black')
+plt.title('Central Asia')
+plt.xlabel('Social Progress Index')
+plt.ylabel('GDP per capita')
+plt.ylim(0, 10000)
+plt.show()
+
